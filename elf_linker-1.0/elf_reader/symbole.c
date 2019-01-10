@@ -28,8 +28,6 @@ void readSymbole(FILE *f, Elf32_Ehdr *ehdr, Elf32_Shdr * shdr,  Elf32_Sym *symb,
     inverse(f, &symb[i].st_other, sizeof(symb[i].st_other)); //fournit la visibilité du symbole(Vis)
     inverse(f, &symb[i].st_shndx, sizeof(symb[i].st_shndx)); //Indice de la section contenant le symbole
   }
-
-
 }
 
 

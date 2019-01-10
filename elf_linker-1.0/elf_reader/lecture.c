@@ -7,7 +7,6 @@
 #include <elf.h>
 #include "header.h"
 #include "section.h"
-#include "contenuS.h"
 #include "symbole.h"
 #include "relocation.h"
 #include "elf32_file.h"
@@ -58,7 +57,7 @@ int main(int argc, char **argv){
       affichageHeader(elf32_file);
       break;
     case 2:
-      afficheTableSection(f, elf32_file);
+      afficheTableSection(elf32_file);
       break;
     case 3:
       affichageSection(f, elf32_file, char_section);

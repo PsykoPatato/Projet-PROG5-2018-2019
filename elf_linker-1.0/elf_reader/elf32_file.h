@@ -1,3 +1,6 @@
+#ifndef __ELF32_FILE_H__
+#define __ELF32_FILE_H__
+
 #include <elf.h>
 
 typedef struct Elf32_File{
@@ -11,7 +14,9 @@ typedef struct Elf32_File{
 
 Elf32_File* initElf32_File(FILE *f);
 void affichageHeader(Elf32_File* elf32_file);
-void afficheTableSection(FILE *f, Elf32_File *elf32_file);
+void afficheTableSection(Elf32_File *elf32_file);
 void afficheSection(FILE *f, Elf32_File *elf32_file, char* char_section);
 void afficheTableSymbole(FILE *f, Elf32_File *elf32_file);
 void afficheTableReadressage(FILE *f, Elf32_File *elf32_file);
+
+#endif

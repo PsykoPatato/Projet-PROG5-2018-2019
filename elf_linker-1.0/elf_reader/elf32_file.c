@@ -2,25 +2,27 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
 #include "elf32_file.h"
 #include "header.h"
 #include "section.h"
-#include "contenuS.h"
 #include "symbole.h"
 #include "relocation.h"
 
 Elf32_File* initElf32_File(FILE *f){
+  Elf32_File *elf32_file = malloc(sizeof(Elf32_File));
+
   Elf32_Ehdr *ehdr = malloc(sizeof(Elf32_Ehdr));
+  elf32_file->ehdr = ehdr;
   assert(ehdr != NULL);
   readHeader(f, ehdr);
 
-  Elf32_Shdr *shdr = malloc(sizeof(Elf32_Shdr) *ehdr->e_shnum);
-  assert(shdr != NULL);
-  readSection(f, ehdr, shdr);
-
-  Elf32_File *elf32_file = malloc(sizeof(Elf32_File));
-  elf32_file->ehdr = ehdr;
+  Elf32_Shdr *shdr = malloc(sizeof(Elf32_Shdr) * ehdr->e_shnum);
   elf32_file->shdr = shdr;
+  assert(shdr != NULL);
+  readTableSection(f, ehdr, shdr);
 
   int size = elf32_file->shdr[elf32_file->ehdr->e_shstrndx].sh_size;
   char *nom = malloc(size);
@@ -67,8 +69,8 @@ Elf32_File* initElf32_File(FILE *f){
   Elf32_Sym *symb;
   symb = malloc(sizeof(Elf32_Sym) * taille);
   assert(symb != NULL);
-  readSymbole(f,elf32_file->ehdr, elf32_file->shdr, elf32_file->symb, elf32_file->iSym);
   elf32_file->symb = symb;
+  readSymbole(f,elf32_file->ehdr, elf32_file->shdr, elf32_file->symb, elf32_file->iSym);
 
   return elf32_file;
 }
@@ -77,35 +79,13 @@ void affichageHeader(Elf32_File *elf32_file){
   printHeader(elf32_file->ehdr);
 }
 
-void afficheTableSection(FILE *f, Elf32_File *elf32_file){
+void afficheTableSection(Elf32_File *elf32_file){
     printf("affichage de la table de section\n");
-    printSection(f, elf32_file->ehdr, elf32_file->shdr, elf32_file->nom);
+    printTableSection(elf32_file->ehdr, elf32_file->shdr, elf32_file->nom);
 }
 
 void affichageSection(FILE *f, Elf32_File* elf32_file, char* char_section){
-  int i, v = atoi(char_section);
-  int ind;
-  char *nomS; //nom de la section à afficher
-  if(v > 0 && v < elf32_file->ehdr->e_shnum){ //alors s est le num de la section
-   ind = v;
-   nomS = elf32_file->nom+elf32_file->shdr[v].sh_name;
-  }else{   //s est le nom de la section
-   i=0;
-   while (i < elf32_file->ehdr->e_shnum && strcmp(char_section, elf32_file->nom+elf32_file->shdr[i].sh_name)) {
-     i++;
-   }
-   if(i == elf32_file->ehdr->e_shnum){
-     printf("nom de section invalide!\n");
-     ind = 0;
-     nomS = "";
-     //exit(3);
-   }
-   else{
-     nomS = char_section;
-     ind = i;
-   }
-  }
-  contenuS(f, elf32_file->ehdr, elf32_file->shdr, atoi(char_section), nomS);
+  printSection(f, elf32_file->ehdr, elf32_file->shdr, elf32_file->nom, char_section);
 }
 
 void afficheTableSymbole(FILE *f, Elf32_File *elf32_file){
